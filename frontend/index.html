@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velai Portal | Career & Hiring Platform</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Floating Toast Notification (Z-Index guarantees foreground display) -->
+  <div id="alertBanner" class="alert-banner hidden"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-brand" onclick="showView('home')">
+      <img src="logo.png" alt="Velai Portal Logo" class="brand-logo" onerror="this.style.display='none'" />
+      <span class="brand-title">Velai<span class="brand-accent">Portal</span></span>
+    </div>
+
+    <nav class="nav-links" id="navLinks">
+      <button class="nav-btn" onclick="showView('home')">Home</button>
+      <button class="nav-btn non-recruiter" onclick="showView('browse')">Explore Jobs</button>
+      
+      <!-- Candidate Links -->
+      <button class="nav-btn candidate-only" onclick="showView('my-applications')">My Applications</button>
+      <button class="nav-btn candidate-only" onclick="showView('candidate-profile')">Profile & Skills</button>
+      
+      <!-- Recruiter Links -->
+      <button class="nav-btn recruiter-only" onclick="showView('my-jobs')">My Posted Jobs</button>
+      <button class="nav-btn recruiter-only" onclick="showView('post-job')">+ Post Job</button>
+      <button class="nav-btn recruiter-only" onclick="showView('company-profile')">Company</button>
+      
+      <!-- Admin Link -->
+      <button class="nav-btn admin-only" onclick="showView('admin-dashboard')">Admin Panel</button>
+      
+      <!-- Public / Auth State -->
+      <button class="nav-btn auth-out btn-secondary-nav" onclick="showView('login')">Sign In</button>
+      <button class="nav-btn auth-out btn-primary-nav" onclick="showView('register')">Register</button>
+      
+      <span class="user-badge auth-in" id="navUserBadge"></span>
+      <button class="nav-btn btn-danger-nav auth-in" onclick="handleLogout()">Sign Out</button>
+    </nav>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="container">
+
+    <!-- VIEW: Home -->
+    <section id="view-home" class="view">
+      <div class="hero-section">
+        <div class="hero-badge">Next-Gen Recruitment Platform</div>
+        <h1 class="hero-headline">Connecting Tamil Nadu & Global Talent with World-Class Teams</h1>
+        <p class="hero-subtext">Velai Portal streamlines recruitment through direct, skill-based hiring. 
+            Whether you are seeking your next career leap or building an engineering team, get started in seconds. </p>
+        
+        <div class="hero-actions" id="heroActionButtons"></div>
+
+        <div class="hero-stats-row">
+          <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Verified Tech Roles</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">Direct</span>
+            <span class="stat-label">Recruiter Contact</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">Instant</span>
+            <span class="stat-label">Application Tracking</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: Browse Jobs (Public / Candidate) -->
+    <section id="view-browse" class="view hidden">
+      <div class="section-header">
+        <div>
+          <h2>Explore Career Opportunities</h2>
+          <p class="section-subtitle">Find jobs that match your skills and experience level</p>
+        </div>
+        <div class="search-bar">
+          <div class="search-input-group">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchTitle" placeholder="Search role (e.g. Java, Frontend)" />
+          </div>
+          <div class="search-input-group">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <input type="text" id="searchLocation" placeholder="Location (e.g. Chennai, Bengaluru)" /> 
+          </div>
+          <button class="btn btn-primary" onclick="loadJobs()">Filter Jobs</button>
+        </div>
+      </div>
+      <div id="jobList" class="card-grid"></div>
+    </section>
+
+    <!-- VIEW: Recruiter Only - My Posted Jobs -->
+    <section id="view-my-jobs" class="view hidden">
+      <div class="section-header flex-between">
+        <div class="poscontainer">
+          <h2>My Posted Jobs</h2>
+          <p class="section-subtitle">Manage listings and review candidate submissions for your company</p>
+        </div>
+        <button class="btn btn-primary" onclick="showView('post-job')">+ Post New Opening</button>
+      </div>
+      <div id="recruiterJobList" class="card-grid"></div>
+    </section>
+
+    <!-- VIEW: Login -->
+    <section id="view-login" class="view hidden">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-icon-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          </div>
+          <h2>Sign in to Velai Portal</h2>
+          <p>Enter your account credentials to access your portal</p>
+        </div>
+        <form onsubmit="handleLogin(event)" class="auth-form">
+          <div class="form-group">
+            <label>Work or Personal Email</label>
+            <input type="email" id="loginEmail" placeholder="name@domain.com" required />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary full-width">Continue to Account</button>
+          <p class="auth-footer-text">Don't have an account? <a href="#" onclick="showView('register')">Create one now</a></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: Register -->
+    <section id="view-register" class="view hidden">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-icon-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          </div>
+          <h2>Join Velai Portal</h2>
+          <p>Select your user profile type to get started</p>
+        </div>
+        <form onsubmit="handleRegister(event)" class="auth-form">
+          <div class="form-group">
+            <label class="section-label">I am joining as:</label>
+            <div class="role-box-container">
+              <label class="role-box">
+                <input type="radio" name="regRole" value="CANDIDATE" checked />
+                <div class="role-box-inner">
+                  <svg viewBox="0 0 24 24" class="box-icon" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <span class="box-title">Candidate</span>
+                  <span class="box-subtitle">Seeking jobs</span>
+                </div>
+              </label>
+
+              <label class="role-box">
+                <input type="radio" name="regRole" value="RECRUITER" />
+                <div class="role-box-inner">
+                  <svg viewBox="0 0 24 24" class="box-icon" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  <span class="box-title">Recruiter</span>
+                  <span class="box-subtitle">Hiring team</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="e.g. Sundar Raman" required />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="sundar@example.com" required />
+          </div>
+          <div class="form-group">
+            <label>Secure Password</label>
+            <input type="password" id="regPassword" placeholder="Minimum 6 characters" required minlength="6" />
+          </div>
+
+          <button type="submit" class="btn btn-primary full-width">Create Free Account</button>
+          <p class="auth-footer-text">Already registered? <a href="#" onclick="showView('login')">Sign in here</a></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: Candidate Applications -->
+    <section id="view-my-applications" class="view hidden">
+      <div class="section-header">
+        <h2>My Submitted Applications</h2>
+        <p class="section-subtitle">Real-time status updates on your job submissions</p>
+      </div>
+      <div id="applicationsTableContainer" class="table-container"></div>
+    </section>
+
+    <!-- VIEW: Candidate Profile -->
+    <section id="view-candidate-profile" class="view hidden">
+      <div class="dashboard-card">
+        <div class="card-top-header">
+          <h2>Candidate Profile & Skills</h2>
+          <p>Highlight your tech qualifications for hiring managers</p>
+        </div>
+        <form onsubmit="handleUpdateCandidateProfile(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Degree / Education</label>
+              <input type="text" id="candEducation" placeholder="e.g. B.E Computer Science" />
+            </div>
+            <div class="form-group">
+              <label>Years of Industry Experience</label>
+              <input type="number" id="candExperience" min="0" placeholder="2" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Current Location</label>
+              <input type="text" id="candLocation" placeholder="e.g. Chennai, Tamil Nadu" />
+            </div>
+            <div class="form-group">
+              <label>Contact Phone Number</label>
+              <input type="tel" id="candPhone" placeholder="+91 9876543210" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Resume Link / Cloud URL (Google Drive, GitHub, S3)</label>
+            <input type="url" id="candResume" placeholder="https://drive.google.com/..." />
+          </div>
+          <div class="form-group">
+            <label>Technical Skills (Comma-separated)</label>
+            <input type="text" id="candSkills" placeholder="Java, Spring Boot, MySQL, React, AWS" />
+          </div>
+          <div class="form-group">
+            <label>Professional Bio / Summary</label>
+            <textarea id="candAbout" rows="4" placeholder="Brief overview of your engineering background..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Profile Changes</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: Recruiter Post Job -->
+    <section id="view-post-job" class="view hidden">
+      <div class="dashboard-card">
+        <div class="card-top-header">
+          <h2>Publish New Career Opening</h2>
+          <p>Reach qualified talent directly through Velai Portal</p>
+        </div>
+        <form onsubmit="handlePostJob(event)">
+          <div class="form-group">
+            <label>Role / Position Title</label>
+            <input type="text" id="jobTitle" required placeholder="e.g. Senior Java Backend Developer" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Employment Type</label>
+              <select id="jobType" required>
+                <option value="FULL_TIME">Full Time</option>
+                <option value="PART_TIME">Part Time</option>
+                <option value="INTERNSHIP">Internship</option>
+                <option value="APPRENTICE">Apprentice</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Work Location</label>
+              <input type="text" id="jobLocation" required placeholder="e.g. Chennai / Hybrid / Remote" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Offered Annual Salary (₹)</label>
+              <input type="number" id="jobSalary" step="1000" placeholder="1200000" />
+            </div>
+            <div class="form-group">
+              <label>Required Experience (Years)</label>
+              <input type="number" id="jobExp" min="0" placeholder="2" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Application Expiry Date & Time</label>
+            <input type="datetime-local" id="jobDeadline" required />
+            <small class="helper-text">Candidates cannot submit applications after this date.</small>
+          </div>
+          <div class="form-group">
+            <label>Required Competencies / Skills (Comma-separated)</label>
+            <input type="text" id="jobSkills" placeholder="Java, Spring Boot, MySQL, REST APIs" required />
+          </div>
+          <div class="form-group">
+            <label>Comprehensive Role Description</label>
+            <textarea id="jobDescription" rows="5" required placeholder="Outline key expectations, daily duties, and engineering stack..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Publish Job Opening</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: Recruiter Company Profile -->
+    <section id="view-company-profile" class="view hidden">
+      <div class="dashboard-card">
+        <div class="card-top-header">
+          <h2>Company Profile & Branding</h2>
+          <p>Provide details about your organization to prospective hires</p>
+        </div>
+        <form onsubmit="handleUpdateCompany(event)">
+          <div class="form-group">
+            <label>Official Organization Name</label>
+            <input type="text" id="compName" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Headquarters Location</label>
+              <input type="text" id="compLocation" placeholder="e.g. Chennai, Tamil Nadu" />
+            </div>
+            <div class="form-group">
+              <label>Company Website</label>
+              <input type="url" id="compWebsite" placeholder="https://company.example.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>About the Organization</label>
+            <textarea id="compDesc" rows="4" placeholder="Culture, mission statement, and core products..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Company Profile</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: Admin Dashboard -->
+    <section id="view-admin-dashboard" class="view hidden">
+      <div class="section-header">
+        <h2>Velai Portal Administration</h2>
+        <p class="section-subtitle">System metrics, user moderation, and platform controls</p>
+      </div>
+
+      <div class="hero-stats-row" style="margin-bottom: 2rem; border-top: none; padding-top: 0;">
+        <div class="stat-item">
+          <span class="stat-number" id="metricUsers">0</span>
+          <span class="stat-label">Registered Accounts</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="metricJobs">0</span>
+          <span class="stat-label">Total Jobs Posted</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="metricApps">0</span>
+          <span class="stat-label">Applications Submitted</span>
+        </div>
+      </div>
+
+      <div class="dashboard-card" style="width: 100%;">
+        <div class="card-top-header">
+          <h2>User Directory & Moderation</h2>
+          <p>Inspect platform accounts and manage user access</p>
+        </div>
+        <div id="adminUsersTableContainer" class="table-container"></div>
+      </div>
+
+      <div class="dashboard-card" style="width: 100%; margin-top: 1.5rem;">
+        <div class="card-top-header">
+          <h2>Platform Jobs Moderation</h2>
+          <p>Review and remove spam or expired job postings across all recruiters</p>
+        </div>
+        <div id="adminJobsTableContainer" class="table-container"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: View Job Applicants (Single, Clean Modal) -->
+  <div id="applicantsModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalTitle">Candidate Applications</h3>
+          <p class="modal-subtitle">Update recruitment pipeline status</p>
+        </div>
+        <button class="modal-close" onclick="closeApplicantsModal()">&times;</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Job Posting (Recruiter) -->
+  <div id="editJobModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Edit Job Posting</h3>
+          <p class="modal-subtitle">Update job details, requirements, or deadline</p>
+        </div>
+        <button class="modal-close" onclick="closeEditJobModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleUpdateJob(event)">
+          <input type="hidden" id="editJobId" />
+          <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" id="editJobTitle" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Employment Type</label>
+              <select id="editJobType" required>
+                <option value="FULL_TIME">Full Time</option>
+                <option value="PART_TIME">Part Time</option>
+                <option value="INTERNSHIP">Internship</option>
+                <option value="APPRENTICE">Apprentice</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Work Location</label>
+              <input type="text" id="editJobLocation" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Annual Salary (₹)</label>
+              <input type="number" id="editJobSalary" step="1000" />
+            </div>
+            <div class="form-group">
+              <label>Experience Required (Years)</label>
+              <input type="number" id="editJobExp" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Application Deadline</label>
+            <input type="datetime-local" id="editJobDeadline" required />
+          </div>
+          <div class="form-group">
+            <label>Required Skills (Comma-separated)</label>
+            <input type="text" id="editJobSkills" required />
+          </div>
+          <div class="form-group">
+            <label>Job Description</label>
+            <textarea id="editJobDescription" rows="4" required></textarea>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeEditJobModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </di                              v>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>  
