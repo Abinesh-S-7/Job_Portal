@@ -105,8 +105,11 @@ erDiagram
     JOBS }o--o{ SKILLS : "M:N job_skills"
     CANDIDATE_PROFILES ||--o{ APPLICATIONS : "1:N submits"
     JOBS ||--o{ APPLICATIONS : "1:N receives"
+```
 
 ---
+
+## 🚀 API Endpoints Overview
 
 ## 🚀 API Endpoints Overview
 
