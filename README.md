@@ -111,8 +111,6 @@ erDiagram
 
 ## 🚀 API Endpoints Overview
 
-## 🚀 API Endpoints Overview
-
 <details>
 <summary><b>Click to expand REST API Route Map</b></summary>
 
