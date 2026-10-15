@@ -1,0 +1,21 @@
+# Compiled binaries & build artifacts
+**/target/
+**/*.class
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+.vscode/
+
+# Logs & temp files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
