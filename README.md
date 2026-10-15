@@ -96,29 +96,15 @@
 
 ## 🗄️ Database Entity Schema
 
-
-```
-
-```
-┌──────────────┐             1:1             ┌────────────────────┐
-│    users     ├────────────────────────────►│ candidate_profiles │
-└──────┬───────┘                             └─────────┬──────────┘
-       │                                               │
-       │ 1:1                                           │ M:N (candidate_skills)
-       ▼                                               ▼
-┌──────────────┐                             ┌────────────────────┐
-│  companies   │                             │       skills       │
-└──────┬───────┘                             └─────────▲──────────┘
-       │                                               │
-       │ 1:N                                           │ M:N (job_skills)
-       ▼                                               │
-┌──────────────┐             1:N             ┌─────────┴──────────┐
-│     jobs     ├────────────────────────────►│    applications    │
-└──────────────┘                             └────────────────────┘
-
-```
-
-```
+```mermaid
+erDiagram
+    USERS ||--|| CANDIDATE_PROFILES : "1:1 has"
+    USERS ||--|| COMPANIES : "1:1 manages"
+    COMPANIES ||--o{ JOBS : "1:N posts"
+    CANDIDATE_PROFILES }o--o{ SKILLS : "M:N candidate_skills"
+    JOBS }o--o{ SKILLS : "M:N job_skills"
+    CANDIDATE_PROFILES ||--o{ APPLICATIONS : "1:N submits"
+    JOBS ||--o{ APPLICATIONS : "1:N receives"
 
 ---
 
